@@ -102,7 +102,7 @@ jobs:
 
           # Prefix used for identity/matching; date suffix is for display only
           title_prefix="🤖 Upstream testing failure"
-          issue_title="${title_prefix} ($(date -u +%Y-%m-%d))"
+          issue_title="${title_prefix} ($(date -u +%Y-%m-%d-%H:%M))"
 
           # Find existing open issue whose title starts with the fixed prefix
           existing_issue=$(gh issue list --state open --label "CI" --json number,title \
