@@ -1,6 +1,16 @@
 name: CI Upstream
 on:
   workflow_dispatch:
+    inputs:
+      force_outcome:
+        description: 'Force upstream-dev outcome for testing'
+        required: false
+        type: choice
+        options:
+          - normal
+          - force_success
+          - force_failure
+        default: normal
   schedule:
      - cron: '0 0 * * *' # Daily “At 00:00”
 
@@ -55,6 +65,13 @@ jobs:
       - name: Running Tests
         id: tests
         run: |
+          if [ "${{ github.event.inputs.force_outcome }}" = "force_failure" ]; then
+            echo "Forcing failure for testing"
+            exit 1
+          elif [ "${{ github.event.inputs.force_outcome }}" = "force_success" ]; then
+            echo "Forcing success for testing"
+            exit 0
+          fi
           python -m pytest test -v --cov=./uxarray --cov-report=xml
 
   failure-issue:
@@ -62,8 +79,7 @@ jobs:
     needs: [upstream-dev]
     if: |
       needs.upstream-dev.outputs.testresults != 'success'
-      && github.repository == 'UXARRAY/uxarray'
-      && github.ref == 'refs/heads/main'
+      && github.repository == 'Sevans711/uxarray'
     runs-on: ubuntu-latest
     defaults:
       run:
